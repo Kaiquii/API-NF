@@ -1,0 +1,32 @@
+# Go: binários, artefatos de teste e cache local
+bin/
+*.exe
+*.test
+*.out
+coverage.out
+.gocache/
+
+# Variáveis de ambiente e configurações locais
+.env
+.env.*
+!.env.example
+*.local
+
+# Certificados e chaves privadas usados na emissão fiscal
+*.pfx
+*.p12
+*.pem
+*.key
+certificates/
+certificados/
+
+# Logs e arquivos temporários
+*.log
+tmp/
+temp/
+
+# Arquivos locais de IDE
+.idea/workspace.xml
+.idea/vcs.xml
+.idea/httpRequests/
+.vscode/
