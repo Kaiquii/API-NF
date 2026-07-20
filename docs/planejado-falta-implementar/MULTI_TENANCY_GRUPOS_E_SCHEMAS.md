@@ -74,9 +74,9 @@ Postgres
 ├── tenant_<uuid_grupo_a>
 │   ├── companies
 │   ├── integrations
-│   ├── invoice_requests
-│   ├── invoices
-│   ├── invoice_items
+│   ├── fiscal_document_requests
+│   ├── fiscal_documents
+│   ├── fiscal_document_items
 │   ├── products
 │   ├── recipients
 │   └── tax_rules

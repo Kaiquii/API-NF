@@ -24,17 +24,29 @@ As decisoes desta etapa estao documentadas em `docs/planejado-falta-implementar/
 
 Resultado: plataforma configuravel na entrada, com nucleo fiscal interno, validacao obrigatoria, regras versionadas e modulos fiscais independentes.
 
-### Etapa 2 - Modelo interno da nota
+### Etapa 2 - Consolidacao de dominio e nomenclatura
 
-Status: `[ ]`
+Status: `[x]`
 
-Definir o contrato canonico da nota dentro da plataforma. Ele deve conter, no minimo, emitente, destinatario, itens, impostos, frete, pagamentos, totais, informacoes adicionais e referencias fiscais.
+Padronizar os conceitos tecnicos da plataforma e remover ambiguidades entre grupo, cliente, empresa, integracao, nota e documento fiscal.
+
+As decisoes desta etapa estao documentadas em `docs/planejado-falta-implementar/DECISOES_DE_DOMINIO_E_NOMENCLATURA.md`.
+
+Resultado: `group` identifica o tenant, `company` identifica o emitente, `integration` identifica a entrada configurada e `fiscal document` identifica o recurso generico de emissao.
+
+### Etapa 3 - Modelo interno do documento fiscal
+
+Status: `[x]`
+
+Definir o contrato canonico do documento fiscal dentro da plataforma. Ele deve conter, no minimo, emitente, destinatario, itens, impostos, frete, pagamentos, totais, informacoes adicionais e referencias fiscais.
 
 Todo payload recebido, seja padrao ou customizado, deve ser convertido para esse modelo antes do processamento fiscal.
 
-Resultado esperado: contrato canonico da nota, com campos, tipos, obrigatoriedade e exemplos de payload valido.
+As decisoes desta etapa estao documentadas em `docs/planejado-falta-implementar/MODELO_INTERNO_DE_DOCUMENTOS_FISCAIS.md`.
 
-### Etapa 3 - Regras de preenchimento fiscal
+Resultado: envelope comum, contratos por modulo, referencia `nfe/v1`, regras de normalizacao, rastreabilidade e versionamento.
+
+### Etapa 4 - Regras de preenchimento fiscal
 
 Status: `[ ]`
 
@@ -51,7 +63,7 @@ Tambem deve ficar claro quais campos sao obrigatorios para o cliente e quais pod
 
 Resultado esperado: matriz de responsabilidade de cada campo fiscal, incluindo origem, regra de preenchimento e validacao.
 
-### Etapa 4 - Numeracao, idempotencia e maquina de estados
+### Etapa 5 - Numeracao, idempotencia e maquina de estados
 
 Status: `[ ]`
 
@@ -63,7 +75,7 @@ Erros temporarios de comunicacao com a SEFAZ podem ser retentados. Rejeicoes fis
 
 Resultado esperado: diagrama de estados, regras de transicao, politica de retentativas e estrategia de reserva de numeracao.
 
-### Etapa 5 - Contratos da API e mapeamento de integracoes
+### Etapa 6 - Contratos da API e mapeamento de integracoes
 
 Status: `[ ]`
 
@@ -75,7 +87,7 @@ Esta etapa tambem deve detalhar endpoints externos, formato de respostas, erros,
 
 Resultado esperado: contrato da API padrao e especificacao da integracao customizada.
 
-### Etapa 6 - Integracao com a SEFAZ
+### Etapa 7 - Integracao com a SEFAZ
 
 Status: `[ ]`
 
@@ -85,7 +97,7 @@ Esse fluxo deve ser executado por workers assincronos, e nao durante a requisica
 
 Resultado esperado: fluxo tecnico de emissao, contratos entre API e worker, tratamento de retorno e erros da SEFAZ.
 
-### Etapa 7 - Seguranca e dados sensiveis
+### Etapa 8 - Seguranca e dados sensiveis
 
 Status: `[ ]`
 
@@ -93,7 +105,7 @@ Definir como certificados digitais e respectivas senhas serao criptografados, ac
 
 Resultado esperado: politica de seguranca para certificados, dados fiscais, logs, auditoria e acesso administrativo.
 
-### Etapa 8 - Banco de dados e migrations multi-tenant
+### Etapa 9 - Banco de dados e migrations multi-tenant
 
 Status: `[ ]`
 
@@ -103,7 +115,7 @@ As migrations precisam ser aplicadas no schema central e em todos os schemas de 
 
 Resultado esperado: modelo de dados fisico e processo confiavel de provisionamento e atualizacao de schemas.
 
-### Etapa 9 - Operacao e suporte
+### Etapa 10 - Operacao e suporte
 
 Status: `[ ]`
 
@@ -119,7 +131,7 @@ Definir os recursos para acompanhamento da emissao:
 
 Resultado esperado: definicao de observabilidade, atendimento de falhas, webhooks e recursos administrativos necessarios para operar o produto.
 
-### Etapa 10 - Plano de implementacao do MVP
+### Etapa 11 - Plano de implementacao do MVP
 
 Status: `[ ]`
 

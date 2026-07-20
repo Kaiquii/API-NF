@@ -51,18 +51,18 @@ Uma API key de cliente permite apenas consumir os endpoints externos autorizados
 
 | Ação | Método e rota | Regra |
 | --- | --- | --- |
-| Criar primeira chave | `POST /admin/v1/clients/{client_id}/api-keys` | Só cria se o cliente não possuir chave ativa. |
-| Listar chaves | `GET /admin/v1/clients/{client_id}/api-keys` | Retorna metadados; nunca retorna o segredo. |
+| Criar primeira chave | `POST /admin/v1/groups/{group_id}/api-keys` | Só cria se o grupo não possuir chave ativa. |
+| Listar chaves | `GET /admin/v1/groups/{group_id}/api-keys` | Retorna metadados; nunca retorna o segredo. |
 | Revogar chave | `POST /admin/v1/api-keys/{api_key_id}/revoke` | A chave deixa de funcionar imediatamente. |
 | Excluir chave | `DELETE /admin/v1/api-keys/{api_key_id}` | Permitido apenas para chave já revogada; realiza exclusão lógica. |
-| Resetar chave | `POST /admin/v1/clients/{client_id}/api-keys/reset` | Revoga as chaves ativas do cliente e cria uma nova. |
+| Resetar chave | `POST /admin/v1/groups/{group_id}/api-keys/reset` | Revoga as chaves ativas do grupo e cria uma nova. |
 
 ## Criação inicial
 
 Exemplo:
 
 ```http
-POST /admin/v1/clients/jorge/api-keys
+POST /admin/v1/groups/group_01/api-keys
 ```
 
 Resposta:
@@ -82,7 +82,7 @@ O campo `api_key` completo é retornado somente nesta resposta. Depois disso, el
 O reset atende casos como perda da chave, troca preventiva ou suspeita de vazamento.
 
 ```http
-POST /admin/v1/clients/jorge/api-keys/reset
+POST /admin/v1/groups/group_01/api-keys/reset
 ```
 
 Resposta:
@@ -111,7 +111,7 @@ Se a aplicação usar cache para validar credenciais, o cache da chave revogada 
 
 ## Listagem de chaves
 
-Exemplo de retorno de `GET /admin/v1/clients/{client_id}/api-keys`:
+Exemplo de retorno de `GET /admin/v1/groups/{group_id}/api-keys`:
 
 ```json
 [
@@ -140,7 +140,7 @@ O prefixo ajuda a identificar a chave em suporte e auditoria sem expor seu segre
 ```text
 api_keys
 - id
-- client_id
+- group_id
 - prefix
 - secret_hash
 - status                    -- active | revoked | deleted | expired
@@ -159,7 +159,7 @@ O banco de dados, e não apenas a aplicação, deve garantir que um cliente tenh
 
 ```sql
 CREATE UNIQUE INDEX api_keys_one_active_per_client
-ON api_keys (client_id)
+ON api_keys (group_id)
 WHERE status = 'active';
 ```
 
@@ -206,6 +206,6 @@ Quando necessário para evitar revelar a existência de um recurso de outro clie
 
 ## Evolução futura
 
-Se o produto passar a atender integrações corporativas mais complexas, a autenticação poderá evoluir para OAuth 2.0 Client Credentials com tokens JWT de curta duração. Essa evolução não substitui a necessidade de autorização por cliente, empresa e recurso.
+Se o produto passar a atender integrações corporativas mais complexas, a autenticação poderá evoluir para OAuth 2.0 Client Credentials com tokens JWT de curta duração. Essa evolução não substitui a necessidade de autorização por grupo, empresa e recurso.
 
 Para o MVP, API key por cliente com reset imediato é a abordagem escolhida.

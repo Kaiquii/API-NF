@@ -2,7 +2,7 @@
 
 ## Objetivo
 
-Criar uma API em Go, usando Postgres como banco de dados, para receber dados de notas fiscais enviados pelos clientes, transformar esses dados em um modelo interno padronizado, gerar a nota fiscal eletrônica e transmitir para a SEFAZ.
+Criar uma API em Go, usando Postgres como banco de dados, para receber dados de documentos fiscais enviados pelos grupos, transformar esses dados em um modelo interno padronizado, gerar o documento fiscal e transmitir para a autoridade fiscal responsavel.
 
 A ideia principal e que os clientes possam consumir nossa API mesmo que seus sistemas enviem dados em formatos diferentes. Por isso, a API precisa ter uma camada de entrada flexivel, mas manter um modelo interno rigido e bem validado antes de gerar qualquer XML fiscal.
 
@@ -33,7 +33,7 @@ Geracao de XML
 Assinatura digital
         |
         v
-Envio para SEFAZ
+Envio para autoridade fiscal
         |
         v
 Consulta de processamento
@@ -49,7 +49,7 @@ A API nao deve obrigar todos os clientes a enviarem os dados exatamente no mesmo
 Por isso, vamos trabalhar com duas camadas:
 
 1. Entrada flexivel, onde cada cliente pode enviar os dados no formato dele.
-2. Modelo interno padrao, usado pela nossa aplicacao para validar, gerar XML, assinar e enviar para a SEFAZ.
+2. Modelo interno padrao, usado pela nossa aplicacao para validar, gerar XML, assinar e enviar para a autoridade fiscal responsavel.
 
 Exemplo:
 
@@ -113,11 +113,11 @@ Os dois formatos devem ser transformados internamente para algo como:
 /internal/validation
   Valida dados comerciais e fiscais antes da emissao.
 
-/internal/invoice
-  Modelo interno e regras de negocio da nota.
+/internal/fiscaldocument
+  Modelo interno e regras de negocio compartilhadas dos documentos fiscais.
 
-/internal/sefaz
-  Comunicacao com SEFAZ, assinatura, envio e consulta.
+/internal/fiscalauthority
+  Comunicacao com autoridades fiscais, assinatura, envio e consulta.
 
 /internal/certificate
   Leitura e uso de certificado digital A1.
@@ -143,7 +143,7 @@ Os dois formatos devem ser transformados internamente para algo como:
 10. Se estiver valida, a nota entra na fila de emissao.
 11. Worker gera o XML da NF-e ou NFC-e.
 12. Worker assina o XML com certificado digital A1.
-13. Worker envia o lote para a SEFAZ.
+13. Worker envia o lote para a autoridade fiscal responsavel.
 14. Worker consulta o processamento.
 15. Sistema salva protocolo, chave de acesso, XML autorizado e status final.
 16. Cliente consulta a nota ou recebe retorno/webhook.
@@ -153,7 +153,7 @@ Os dois formatos devem ser transformados internamente para algo como:
 ### Entrada no formato padrao da nossa API
 
 ```http
-POST /v1/invoices
+POST /v1/fiscal-documents
 ```
 
 Usado por clientes que conseguem se adequar ao contrato recomendado da nossa API.
@@ -161,7 +161,7 @@ Usado por clientes que conseguem se adequar ao contrato recomendado da nossa API
 ### Entrada por integracao configurada
 
 ```http
-POST /v1/integrations/{integration_id}/invoices
+POST /v1/integrations/{integration_id}/fiscal-documents
 ```
 
 Usado por clientes que enviam dados em um formato proprio. Nesse caso, a API usa a configuracao de mapeamento da integracao.
@@ -169,7 +169,7 @@ Usado por clientes que enviam dados em um formato proprio. Nesse caso, a API usa
 ### Consulta de nota
 
 ```http
-GET /v1/invoices/{id}
+GET /v1/fiscal-documents/{id}
 ```
 
 Retorna status, chave de acesso, protocolo, erros e dados principais da nota.
@@ -177,7 +177,7 @@ Retorna status, chave de acesso, protocolo, erros e dados principais da nota.
 ### Download do XML
 
 ```http
-GET /v1/invoices/{id}/xml
+GET /v1/fiscal-documents/{id}/xml
 ```
 
 Retorna o XML assinado/autorizado.
@@ -185,7 +185,7 @@ Retorna o XML assinado/autorizado.
 ### Cancelamento
 
 ```http
-POST /v1/invoices/{id}/cancel
+POST /v1/fiscal-documents/{id}/cancel
 ```
 
 Cancela uma nota ja autorizada, quando permitido pela regra fiscal.
@@ -193,24 +193,20 @@ Cancela uma nota ja autorizada, quando permitido pela regra fiscal.
 ### Reprocessamento
 
 ```http
-POST /v1/invoices/{id}/retry
+POST /v1/fiscal-documents/{id}/retry
 ```
 
 Tenta reprocessar uma nota que falhou por erro temporario.
 
 ## Tabelas iniciais no Postgres
 
-### clients
+### platform.groups e platform.api_keys
 
-Clientes que consomem nossa API.
+O schema central da plataforma guarda os grupos que consomem a API e suas credenciais. Os dados fiscais e operacionais ficam apenas no schema exclusivo de cada grupo.
 
 ```text
-id
-name
-api_key_hash
-active
-created_at
-updated_at
+groups: id, name, schema_name, status, created_at, updated_at
+api_keys: id, group_id, prefix, secret_hash, status, created_at, updated_at
 ```
 
 ### companies
@@ -219,7 +215,6 @@ Empresas emitentes das notas.
 
 ```text
 id
-client_id
 cnpj
 razao_social
 nome_fantasia
@@ -233,13 +228,12 @@ created_at
 updated_at
 ```
 
-### client_integrations
+### integrations
 
 Configuracoes de entrada e mapeamento por cliente.
 
 ```text
 id
-client_id
 name
 input_type
 mapping_config jsonb
@@ -260,13 +254,12 @@ Exemplo de `mapping_config`:
 }
 ```
 
-### invoice_requests
+### fiscal_document_requests
 
 Registra tudo que chegou na API antes e depois da normalizacao.
 
 ```text
 id
-client_id
 integration_id
 raw_payload jsonb
 normalized_payload jsonb
@@ -276,15 +269,14 @@ created_at
 updated_at
 ```
 
-### invoices
+### fiscal_documents
 
 Representa a nota fiscal no nosso sistema.
 
 ```text
 id
-client_id
 company_id
-invoice_request_id
+fiscal_document_request_id
 numero
 serie
 modelo
@@ -300,13 +292,13 @@ created_at
 updated_at
 ```
 
-### invoice_items
+### fiscal_document_items
 
 Itens da nota fiscal.
 
 ```text
 id
-invoice_id
+fiscal_document_id
 sku
 descricao
 ncm
@@ -327,7 +319,6 @@ Cadastro auxiliar para completar informacoes fiscais quando o cliente envia apen
 
 ```text
 id
-client_id
 company_id
 sku
 descricao
@@ -348,7 +339,6 @@ Cadastro de destinatarios.
 
 ```text
 id
-client_id
 cpf_cnpj
 nome
 inscricao_estadual
@@ -421,13 +411,13 @@ Vamos oferecer um contrato oficial recomendado, mas tambem permitir integracoes 
 Formato recomendado:
 
 ```http
-POST /v1/invoices
+POST /v1/fiscal-documents
 ```
 
 Formato flexivel:
 
 ```http
-POST /v1/integrations/{integration_id}/invoices
+POST /v1/integrations/{integration_id}/fiscal-documents
 ```
 
 Assim, clientes mais organizados podem consumir diretamente o contrato padrao, enquanto clientes com sistemas legados podem usar uma integracao configurada.
@@ -447,7 +437,7 @@ Para comecar com seguranca:
 9. Validar dados obrigatorios.
 10. Gerar XML.
 11. Assinar XML.
-12. Enviar para SEFAZ.
+12. Enviar para a autoridade fiscal responsavel.
 13. Consultar autorizacao.
 14. Salvar XML autorizado.
 
@@ -465,7 +455,7 @@ Depois do MVP, podemos evoluir para:
 
 ## Decisao arquitetural importante
 
-A camada da SEFAZ nunca deve conhecer o formato original do cliente.
+A camada da autoridade fiscal nunca deve conhecer o formato original recebido do grupo.
 
 O cliente pode mandar dados em varios formatos, mas antes de chegar na emissao fiscal tudo precisa estar convertido para um modelo interno unico, rigido, rastreavel e validado.
 
