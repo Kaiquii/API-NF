@@ -48,7 +48,7 @@ Resultado: envelope comum, contratos por modulo, referencia `nfe/v1`, regras de 
 
 ### Etapa 4 - Regras de preenchimento fiscal
 
-Status: `[ ]`
+Status: `[~]`
 
 Definir a origem de cada informacao obrigatoria da nota.
 
@@ -60,6 +60,8 @@ Exemplos:
 - serie e numeracao controladas pela empresa emitente.
 
 Tambem deve ficar claro quais campos sao obrigatorios para o cliente e quais podem ser completados pela plataforma.
+
+A direcao desta etapa esta documentada em `docs/pendente-planejamento/REGRAS_DE_PREENCHIMENTO_FISCAL.md`. A etapa permanece em planejamento ate a definicao da empresa real do MVP e a conclusao da matriz de campos do contrato `nfe/v1`.
 
 Resultado esperado: matriz de responsabilidade de cada campo fiscal, incluindo origem, regra de preenchimento e validacao.
 
