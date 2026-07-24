@@ -61,7 +61,7 @@ Exemplos:
 
 Tambem deve ficar claro quais campos sao obrigatorios para o cliente e quais podem ser completados pela plataforma.
 
-A direcao desta etapa esta documentada em `docs/pendente-planejamento/REGRAS_DE_PREENCHIMENTO_FISCAL.md`. A etapa permanece em planejamento ate a definicao da empresa real do MVP e a conclusao da matriz de campos do contrato `nfe/v1`.
+A direcao desta etapa esta documentada em `docs/pendente-planejamento/REGRAS_DE_PREENCHIMENTO_FISCAL.md`. A etapa permanece em planejamento ate a conclusao da matriz base do `nfe/v1`, das regras condicionais por cenario e dos criterios usados para habilitar cada cobertura fiscal.
 
 Resultado esperado: matriz de responsabilidade de cada campo fiscal, incluindo origem, regra de preenchimento e validacao.
 

@@ -4,7 +4,7 @@
 
 Definir de onde vem cada informação necessária para formar um documento fiscal, quem é responsável pelo dado, quando a plataforma pode completá-lo e quais validações devem ocorrer antes da emissão.
 
-Esta etapa começa pela NF-e do MVP. A matriz completa de campos ainda será detalhada durante o planejamento.
+Esta etapa começa pela NF-e como primeiro módulo fiscal, mas sua estrutura não será baseada em uma empresa ou segmento específico. A matriz completa de campos e cenários ainda será detalhada durante o planejamento.
 
 ## Decisão central
 
@@ -85,23 +85,25 @@ O motor fiscal será responsável pelos resultados derivados da operação:
 
 Valores calculados não devem ser aceitos cegamente do ERP. Quando forem recebidos para conferência ou compatibilidade, a plataforma deverá validá-los ou recalculá-los conforme a política definida.
 
-## Recorte inicial do MVP
+## Cobertura progressiva e independente de cliente
 
-A primeira matriz de preenchimento será construída para um cenário controlado:
+A estrutura fiscal da plataforma será definida por documento e cenário, nunca por uma empresa específica.
 
 ```text
-Documento: NF-e modelo 55
-Operação inicial: venda
-Ambiente inicial: homologação
-Emitente: uma empresa inicial
-UF: UF da empresa emitente inicial
-Regime tributário: regime real da empresa emitente inicial
-Destino inicial: operação interna
+Contrato base do documento
+  -> campos condicionais
+  -> dimensões do cenário fiscal
+  -> pacote de regras vigente
+  -> decisão fiscal
 ```
 
-O regime tributário e a UF não serão escolhidos apenas para simplificar o desenvolvimento. Eles deverão corresponder à empresa real usada na homologação.
+A NF-e modelo 55 será o primeiro módulo planejado. A matriz base deverá representar os conceitos comuns do documento sem assumir previamente uma UF, um regime tributário ou um segmento comercial.
 
-Depois que esse cenário estiver completamente planejado, implementado e validado, a matriz poderá ser ampliada para operações interestaduais, devoluções, transferências, outros regimes e outros documentos fiscais.
+Empresas reais poderão ser usadas como casos de validação e homologação. Elas não definirão os nomes, a estrutura ou as regras gerais do contrato.
+
+A arquitetura será preparada para vários segmentos desde o início, mas a disponibilidade será progressiva. Um cenário somente poderá ser declarado como suportado depois que suas regras estiverem documentadas, implementadas, testadas e homologadas.
+
+Operações ainda não suportadas deverão ser recusadas de forma explícita. A plataforma não poderá aplicar uma regra aproximada ou reutilizar silenciosamente um cenário incompatível.
 
 ## Dados mínimos esperados do ERP
 
@@ -147,7 +149,104 @@ NCM, unidade, origem e classificações tributárias poderão ser completados po
 
 Esses blocos serão obrigatórios apenas quando o cenário fiscal ou comercial exigir.
 
-## Matriz de preenchimento
+### Dados fiscais enviados pelo ERP
+
+NCM, CEST, CFOP, CST, CSOSN, alíquotas, bases e valores de tributos não serão obrigatórios no contrato padrão apenas porque o ERP os possui.
+
+Quando forem enviados, deverão ser tratados como informação de origem ou sugestão para conferência. A plataforma continuará responsável por validar o enquadramento e determinar o resultado fiscal oficial por meio dos cadastros, das regras e do motor fiscal.
+
+## Cadastros mínimos
+
+### Empresa
+
+O cadastro da empresa deverá possuir, com vigência quando aplicável:
+
+- CNPJ;
+- razão social e nome fantasia;
+- inscrição estadual e municipal, quando aplicável;
+- endereço, município, código de município e UF;
+- regime tributário;
+- CNAE e configurações fiscais necessárias;
+- documentos fiscais habilitados;
+- séries disponíveis por modelo e ambiente;
+- benefícios ou regimes especiais;
+- status e período de validade das configurações.
+
+Dados oficiais do emitente não poderão ser sobrescritos pelo payload da operação.
+
+### Produto
+
+O cadastro fiscal do produto deverá permitir:
+
+- identificar o produto pelo código ou SKU;
+- armazenar descrição;
+- NCM;
+- CEST quando aplicável;
+- origem da mercadoria;
+- unidade comercial e unidade tributável;
+- fator de conversão entre unidades;
+- GTIN quando existir;
+- características tributárias especiais;
+- vigência do cadastro fiscal.
+
+Quantidade, valor unitário, desconto e demais fatos da venda continuam pertencendo ao ERP.
+
+### Destinatário
+
+O cadastro do destinatário poderá armazenar:
+
+- CPF, CNPJ ou identificação estrangeira;
+- nome ou razão social;
+- indicador de contribuinte;
+- inscrição estadual quando aplicável;
+- endereço completo;
+- SUFRAMA e outras inscrições condicionais;
+- informações de contato.
+
+O cadastro poderá completar dados recorrentes, mas não poderá trocar silenciosamente a identidade do destinatário indicada pelo ERP.
+
+CPF, CNPJ, inscrições e demais documentos serão tratados como texto. O modelo não assumirá que identificadores fiscais são exclusivamente numéricos.
+
+## Matrizes de preenchimento
+
+O planejamento será dividido entre uma matriz base e regras condicionais.
+
+### Matriz base
+
+A matriz base definirá os campos e blocos comuns da NF-e, independentemente do segmento da empresa:
+
+- contexto do documento;
+- identificação;
+- emitente;
+- destinatário e pessoas autorizadas;
+- itens;
+- tributos por item;
+- totais;
+- transporte;
+- cobrança;
+- pagamentos;
+- referências fiscais;
+- informações adicionais e processos.
+
+Ela determinará o significado interno dos dados, seus tipos, fontes possíveis e regras gerais de normalização.
+
+### Regras condicionais
+
+As regras condicionais definirão quando campos, grupos fiscais ou validações adicionais serão aplicáveis.
+
+Exemplos:
+
+```text
+se a operação for interestadual -> avaliar regras entre UFs
+se o destinatário for contribuinte -> aplicar validações correspondentes
+se o produto estiver sujeito a ST -> exigir e calcular o grupo aplicável
+se houver benefício fiscal -> exigir código e fundamentação
+se houver frete -> exigir os dados compatíveis com a modalidade
+```
+
+Condições pertencem ao cenário fiscal, e não ao cliente. Uma regra aplicável poderá ser reutilizada por qualquer grupo que apresente as mesmas características fiscais.
+
+### Definição de cada campo
 
 Cada campo do contrato `nfe/v1` deverá possuir uma definição com, no mínimo:
 
@@ -182,19 +281,132 @@ Exemplo inicial da matriz:
 | Série e número | Configuração da empresa | Não | Sim | Serão controlados pela plataforma. |
 | Bases e tributos | Motor fiscal | Parcialmente | Sim | O resultado oficial é calculado ou validado pela plataforma. |
 
-Esta tabela é apenas a direção inicial. A matriz definitiva deverá detalhar todos os campos aplicáveis ao cenário do MVP.
+Esta tabela é apenas a direção inicial. A matriz definitiva deverá detalhar os campos base e identificar as condições que habilitam os demais campos.
+
+## Dimensões dos cenários fiscais
+
+Os pacotes de regras deverão tomar decisões a partir de dimensões explícitas, como:
+
+```text
+tipo e versão do documento
+vigência da regra
+regime tributário da empresa
+UF e município de origem
+UF e município de destino
+tipo e finalidade da operação
+perfil fiscal do destinatário
+classificação e origem do produto
+características tributárias do item
+benefícios ou regimes especiais
+```
+
+Essas dimensões serão obtidas dos fatos comerciais, dos cadastros e do contexto fiscal. O nome do grupo, o segmento comercial informado pelo cliente ou uma configuração livre não poderão substituir as condições fiscais objetivas.
+
+## Pacotes de regras e habilitação
+
+Regras fiscais serão organizadas em pacotes versionados, imutáveis e com vigência definida.
+
+Cada cenário suportado deverá possuir um manifesto contendo:
+
+```text
+scenario_id
+document_type
+contract_version
+operation_types
+purposes
+tax_regimes
+origin_scope
+destination_scope
+recipient_profiles
+product_constraints
+special_groups
+effective_from
+effective_until
+rule_package
+xml_schema_package
+status
+```
+
+Status do manifesto:
+
+```text
+planned
+implemented
+homologated
+active
+suspended
+retired
+```
+
+Somente um cenário `active` poderá autorizar emissão em produção. Homologação e produção terão habilitações independentes.
+
+Um cenário somente poderá ser declarado como suportado quando:
+
+1. todas as dimensões de entrada estiverem definidas;
+2. todos os campos aplicáveis tiverem origem e precedência;
+3. não houver regra ambígua;
+4. cálculos e arredondamentos estiverem especificados no pacote fiscal;
+5. o XML validar contra o schema oficial aplicável;
+6. casos positivos e negativos estiverem automatizados;
+7. a emissão estiver validada em homologação;
+8. versões, vigências, fontes e limitações estiverem registradas.
+
+Uma empresa poderá usar determinado cenário quando seus dados e sua operação forem compatíveis com essa cobertura. A habilitação não exigirá uma versão própria da API ou código exclusivo por cliente.
+
+## Limite entre a matriz e os pacotes fiscais
+
+A matriz do `nfe/v1` define, campo por campo:
+
+- significado e tipo do dado;
+- origem principal e origens alternativas permitidas;
+- obrigatoriedade base ou condicional;
+- precedência em caso de conflito;
+- possibilidade de sobrescrita e enriquecimento;
+- comportamento quando o dado estiver ausente ou inválido;
+- rastreabilidade e erro semântico.
+
+As fórmulas tributárias e decisões legais específicas não serão incorporadas à matriz base. Elas pertencem aos pacotes fiscais versionados, que deverão considerar as dimensões do cenário e declarar vigência, fontes oficiais, cálculos, arredondamentos, exceções e casos de teste.
+
+```text
+Matriz do nfe/v1
+  -> define quais informações existem e quem responde por elas
+
+Pacote fiscal versionado
+  -> define como enquadrar e calcular para um cenário vigente
+```
+
+Essa separação permite manter o contrato interno estável quando uma regra tributária mudar. Uma atualização legal poderá gerar uma nova versão do pacote fiscal sem obrigar todos os clientes a alterar imediatamente o formato comercial enviado à API.
 
 ## Precedência e conflitos
 
 Não haverá uma única ordem de precedência válida para todos os campos.
 
-- Fatos comerciais, como quantidade e valor unitário, têm o ERP como fonte principal.
-- Dados do emitente têm o cadastro da empresa como fonte oficial.
-- Dados estáveis do produto podem vir do cadastro, com política explícita para aceitar ou rejeitar valores enviados.
-- Decisões tributárias pertencem às regras fiscais.
-- Cálculos e totais oficiais pertencem ao motor fiscal.
+| Categoria | Autoridade principal | Tratamento |
+| --- | --- | --- |
+| Identidade do grupo | API Key | O payload não pode alterar. |
+| Ambiente | API Key e configuração | O payload não pode alternar homologação e produção. |
+| Empresa emitente | `company_id` e cadastro | Dados oficiais não podem ser sobrescritos pelo ERP. |
+| Fatos comerciais | ERP | Cadastro não pode inventar quantidade, valor ou intenção da operação. |
+| Dados fiscais estáveis do produto | Cadastro | O valor do ERP depende da política específica do campo. |
+| Identidade do destinatário | ERP | Cadastro pode completar, mas não substituir silenciosamente. |
+| Enquadramento fiscal | Pacote de regras | Sugestões do ERP precisam ser validadas. |
+| Cálculos e totais | Motor fiscal | Valores do ERP servem apenas para conferência. |
+| Número, série e chave de acesso | Plataforma | Não podem ser informados livremente pelo ERP. |
+| Textos fiscais obrigatórios | Pacote de regras | ERP não pode remover ou sobrescrever. |
 
 Quando duas fontes apresentarem valores diferentes, a plataforma deverá seguir a política específica do campo. O conflito deverá ser validado e registrado; não poderá ser resolvido silenciosamente.
+
+## Política de enriquecimento
+
+Um campo somente poderá ser completado automaticamente quando:
+
+1. a política do campo permitir;
+2. existir uma fonte ativa e identificável;
+3. houver somente uma decisão válida para o contexto;
+4. a regra aplicada estiver vigente;
+5. a transformação puder ser auditada.
+
+Se essas condições não forem atendidas, o documento permanecerá pendente ou inválido.
 
 ## Ausência e ambiguidade
 
@@ -210,6 +422,37 @@ Se um dado fiscal obrigatório estiver ausente, inválido ou tiver mais de uma i
 
 A plataforma não enviará um documento sabidamente incompleto para descobrir se a SEFAZ o aceitará.
 
+O tratamento será separado por natureza:
+
+| Situação | Comportamento |
+| --- | --- |
+| Dado ausente e corrigível | Documento fica com `pending_data`. |
+| Dado inválido | Validação interna bloqueia a emissão. |
+| Conflito entre fontes | Aplicar política explícita ou solicitar correção. |
+| Regra não encontrada | Tratar como configuração fiscal incompleta. |
+| Regras ambíguas | Bloquear como erro de configuração. |
+| Cenário não suportado | Informar explicitamente que a cobertura ainda não está disponível. |
+| Rejeição da autoridade fiscal | Registrar somente depois de uma transmissão efetiva. |
+
+Validação interna e rejeição da autoridade fiscal são conceitos diferentes e não deverão compartilhar a mesma causa ou mensagem.
+
+### Erros semânticos
+
+| Código | Significado |
+| --- | --- |
+| `FISCAL_FIELD_REQUIRED` | Campo obrigatório ausente para o cenário. |
+| `FISCAL_FIELD_INVALID` | Tipo, formato, tamanho ou domínio inválido. |
+| `FISCAL_FIELD_CONFLICT` | Fontes autorizadas apresentaram valores incompatíveis. |
+| `FISCAL_REFERENCE_NOT_FOUND` | Cadastro ou documento referenciado não existe. |
+| `FISCAL_PRODUCT_DATA_MISSING` | Cadastro fiscal do produto é insuficiente. |
+| `FISCAL_RULE_NOT_FOUND` | Nenhuma regra vigente atende ao cenário. |
+| `FISCAL_RULE_AMBIGUOUS` | Mais de uma regra incompatível foi encontrada. |
+| `FISCAL_SCENARIO_UNSUPPORTED` | Cenário ainda não foi habilitado. |
+| `FISCAL_CALCULATION_MISMATCH` | Valor de conferência diverge do cálculo oficial. |
+| `FISCAL_DOCUMENT_NOT_READY` | Existem pendências bloqueantes. |
+
+A Etapa 6 definirá status HTTP, envelope público e formato da resposta. Nesta etapa são definidos apenas o significado e a causa fiscal dos erros.
+
 ## Rastreabilidade
 
 O documento fiscal deverá registrar a origem dos campos relevantes e as versões das regras usadas no processamento.
@@ -224,17 +467,36 @@ Regime tributário: cadastro da empresa
 ICMS: motor fiscal versão 1.0
 ```
 
+Para cada campo relevante, a rastreabilidade deverá permitir registrar:
+
+```text
+field_path
+source_value
+normalized_value
+resolved_value
+source_type
+source_reference
+rule_package
+rule_identifier
+rule_version
+effective_at
+decided_at
+```
+
 Além da origem, deverão ser preservados:
 
 - payload original;
 - resultado do mapeamento;
 - documento normalizado;
-- valores enriquecidos;
+- snapshot enriquecido;
 - conflitos encontrados;
 - versão do contrato `nfe/v1`;
 - versão do módulo fiscal;
 - versão do pacote de regras;
+- pacote de schema XML aplicável;
 - data e hora da decisão fiscal.
+
+Depois da autorização, o snapshot fiscal não poderá ser reinterpretado por versões novas de cadastros ou regras.
 
 ## Experiência do cliente
 
@@ -270,17 +532,22 @@ Mudanças fiscais deverão passar por análise, implementação, testes em homol
 
 ## Ordem de conclusão desta etapa
 
-1. Confirmar empresa, UF, regime tributário e operação real do MVP.
-2. Fechar os dados mínimos que o ERP deve enviar.
+1. Definir a matriz base do `nfe/v1`, independente de segmento.
+2. Fechar os fatos comerciais mínimos que o ERP deve enviar.
 3. Definir os cadastros mínimos de empresa, produto e destinatário.
-4. Detalhar a matriz completa do `nfe/v1` para o cenário escolhido.
-5. Definir precedência, sobrescrita e enriquecimento de cada campo.
-6. Definir erros para ausência, valor inválido e conflito entre fontes.
-7. Definir o registro de origem e versão das regras.
-8. Validar a matriz contra a documentação oficial vigente e o cenário fiscal real.
+4. Identificar as dimensões que determinam os cenários fiscais.
+5. Detalhar as regras condicionais dos campos e grupos fiscais.
+6. Definir precedência, sobrescrita e enriquecimento de cada campo.
+7. Definir erros para ausência, valor inválido, conflito e cenário não suportado.
+8. Definir o registro de origem, vigência e versão das regras.
+9. Definir os critérios para habilitar e declarar um cenário como suportado.
+10. Documentar nos pacotes fiscais, e não na matriz base, as fórmulas e decisões legais específicas.
+11. Validar as matrizes contra a documentação oficial vigente e casos reais de diferentes segmentos.
 
 ## Estado deste planejamento
 
 A direção arquitetural está definida: entrada flexível, responsabilidade comercial do ERP, enriquecimento por cadastros, decisão por regras fiscais e cálculos pelo motor fiscal.
 
-A etapa somente será considerada concluída depois que a empresa real do MVP for definida e a matriz de campos do `nfe/v1` estiver completa e validada.
+A etapa somente será considerada concluída depois que a matriz base do `nfe/v1`, as dimensões dos cenários, as regras condicionais e os critérios de habilitação estiverem completos e validados.
+
+Casos de empresas reais serão usados para confirmar a abrangência do modelo. Nenhuma empresa será usada como padrão estrutural da plataforma.
