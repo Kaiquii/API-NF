@@ -48,7 +48,7 @@ Resultado: envelope comum, contratos por modulo, referencia `nfe/v1`, regras de 
 
 ### Etapa 4 - Regras de preenchimento fiscal
 
-Status: `[~]`
+Status: `[x]`
 
 Definir a origem de cada informacao obrigatoria da nota.
 
@@ -61,9 +61,9 @@ Exemplos:
 
 Tambem deve ficar claro quais campos sao obrigatorios para o cliente e quais podem ser completados pela plataforma.
 
-A direcao desta etapa esta documentada em `docs/pendente-planejamento/REGRAS_DE_PREENCHIMENTO_FISCAL.md`. A etapa permanece em planejamento ate a conclusao da matriz base do `nfe/v1`, das regras condicionais por cenario e dos criterios usados para habilitar cada cobertura fiscal.
+A arquitetura desta etapa esta documentada em `docs/planejado-falta-implementar/REGRAS_DE_PREENCHIMENTO_FISCAL.md`, e o detalhamento dos campos esta em `docs/planejado-falta-implementar/MATRIZ_DE_PREENCHIMENTO_NFE_V1.md`.
 
-Resultado esperado: matriz de responsabilidade de cada campo fiscal, incluindo origem, regra de preenchimento e validacao.
+Resultado: matriz independente de cliente e segmento, com origem, obrigatoriedade, precedencia, enriquecimento, erros, rastreabilidade, manifestos de cenario, criterios de ativacao e testes minimos.
 
 ### Etapa 5 - Numeracao, idempotencia e maquina de estados
 
@@ -148,3 +148,4 @@ Os documentos abaixo ja possuem uma direcao arquitetural e estao em `docs/planej
 - planejamento geral da API fiscal;
 - multi-tenancy por grupos e schemas;
 - autenticacao e gerenciamento de API Keys.
+- regras de preenchimento fiscal e matriz do contrato `nfe/v1`.

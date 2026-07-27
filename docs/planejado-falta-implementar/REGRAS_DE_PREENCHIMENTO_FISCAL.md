@@ -1,10 +1,12 @@
 # Regras de preenchimento fiscal
 
+> Status: planejamento concluído, aguardando implementação.
+
 ## Objetivo
 
 Definir de onde vem cada informação necessária para formar um documento fiscal, quem é responsável pelo dado, quando a plataforma pode completá-lo e quais validações devem ocorrer antes da emissão.
 
-Esta etapa começa pela NF-e como primeiro módulo fiscal, mas sua estrutura não será baseada em uma empresa ou segmento específico. A matriz completa de campos e cenários ainda será detalhada durante o planejamento.
+Esta etapa começa pela NF-e como primeiro módulo fiscal, mas sua estrutura não será baseada em uma empresa ou segmento específico. O detalhamento campo a campo está consolidado em `MATRIZ_DE_PREENCHIMENTO_NFE_V1.md`.
 
 ## Decisão central
 
@@ -546,8 +548,8 @@ Mudanças fiscais deverão passar por análise, implementação, testes em homol
 
 ## Estado deste planejamento
 
-A direção arquitetural está definida: entrada flexível, responsabilidade comercial do ERP, enriquecimento por cadastros, decisão por regras fiscais e cálculos pelo motor fiscal.
+A Etapa 4 está concluída para planejamento. Foram definidos a matriz base do `nfe/v1`, os responsáveis por cada categoria de dado, as regras condicionais, a precedência entre fontes, o enriquecimento permitido, os erros semânticos, a rastreabilidade, o manifesto de cobertura, os critérios de ativação e o catálogo mínimo de testes.
 
-A etapa somente será considerada concluída depois que a matriz base do `nfe/v1`, as dimensões dos cenários, as regras condicionais e os critérios de habilitação estiverem completos e validados.
+Casos de empresas reais serão usados durante a implementação e a homologação para confirmar a abrangência do modelo. Nenhuma empresa será usada como padrão estrutural da plataforma.
 
-Casos de empresas reais serão usados para confirmar a abrangência do modelo. Nenhuma empresa será usada como padrão estrutural da plataforma.
+As fórmulas e decisões legais específicas continuarão nos pacotes fiscais versionados. Numeração, idempotência, contratos HTTP, integração com a SEFAZ, segurança de certificados e modelo físico do banco permanecem reservados às próximas etapas.
