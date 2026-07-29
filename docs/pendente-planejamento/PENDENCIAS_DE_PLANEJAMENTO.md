@@ -67,7 +67,7 @@ Resultado: matriz independente de cliente e segmento, com origem, obrigatoriedad
 
 ### Etapa 5 - Numeracao, idempotencia e maquina de estados
 
-Status: `[ ]`
+Status: `[x]`
 
 Definir como a numeracao sera reservada por empresa, serie e modelo, evitando colisao em chamadas simultaneas.
 
@@ -75,11 +75,13 @@ Definir tambem a estrategia de idempotencia: uma repeticao da mesma requisicao p
 
 Erros temporarios de comunicacao com a SEFAZ podem ser retentados. Rejeicoes fiscais precisam retornar ao cliente para correcao, sem nova tentativa automatica.
 
-Resultado esperado: diagrama de estados, regras de transicao, politica de retentativas e estrategia de reserva de numeracao.
+As decisoes desta etapa estao documentadas em `docs/planejado-falta-implementar/NUMERACAO_IDEMPOTENCIA_E_MAQUINA_DE_ESTADOS.md`.
+
+Resultado: status publico separado do estado interno, numeracao atomica por modulo, idempotencia obrigatoria, tentativas imutaveis, reconciliacao de resultado desconhecido e retentativas controladas.
 
 ### Etapa 6 - Contratos da API e mapeamento de integracoes
 
-Status: `[ ]`
+Status: `[x]`
 
 Definir os limites do `mapping_config`: ele deve servir para mapear e normalizar formatos de entrada, sem se tornar uma camada de regras de negocio arbitrarias por cliente.
 
@@ -87,7 +89,9 @@ Casos que nao puderem ser resolvidos por configuracao devem ter um processo defi
 
 Esta etapa tambem deve detalhar endpoints externos, formato de respostas, erros, versionamento de API, idempotency key e uso de `company_id` e `integration_id`.
 
-Resultado esperado: contrato da API padrao e especificacao da integracao customizada.
+As decisoes desta etapa estao documentadas em `docs/planejado-falta-implementar/CONTRATOS_API_E_MAPEAMENTO_DE_INTEGRACOES.md`.
+
+Resultado: entradas padrao e customizada, DTO publico separado do modelo interno, mapeamento declarativo e versionado, formularios configuraveis, validacao sem emissao, respostas assincronas e erros estruturados.
 
 ### Etapa 7 - Integracao com a SEFAZ
 
