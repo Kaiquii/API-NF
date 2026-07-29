@@ -95,13 +95,15 @@ Resultado: entradas padrao e customizada, DTO publico separado do modelo interno
 
 ### Etapa 7 - Integracao com a SEFAZ
 
-Status: `[ ]`
+Status: `[x]`
 
 Planejar a separacao entre geracao de XML, assinatura com certificado A1, comunicacao com servicos da SEFAZ, consulta de recibo, armazenamento do XML autorizado e contingencia.
 
 Esse fluxo deve ser executado por workers assincronos, e nao durante a requisicao HTTP do cliente.
 
-Resultado esperado: fluxo tecnico de emissao, contratos entre API e worker, tratamento de retorno e erros da SEFAZ.
+As decisoes desta etapa estao documentadas em `docs/planejado-falta-implementar/INTEGRACAO_COM_A_SEFAZ.md`.
+
+Resultado: processamento assincrono por worker, geracao e validacao do XML, assinatura, catalogo de servicos, autorizacao, consultas, reconciliacao, eventos, inutilizacao, contingencia controlada e armazenamento rastreavel dos artefatos fiscais.
 
 ### Etapa 8 - Seguranca e dados sensiveis
 
@@ -153,3 +155,6 @@ Os documentos abaixo ja possuem uma direcao arquitetural e estao em `docs/planej
 - multi-tenancy por grupos e schemas;
 - autenticacao e gerenciamento de API Keys.
 - regras de preenchimento fiscal e matriz do contrato `nfe/v1`.
+- numeracao, idempotencia e maquina de estados;
+- contratos da API e mapeamento de integracoes;
+- integracao assincrona com a SEFAZ.
