@@ -127,7 +127,7 @@ revoked_at
 
 A API Key permanecerá no schema central porque precisa ser validada antes de a aplicação saber qual schema acessar.
 
-No MVP, cada grupo terá somente uma API Key ativa, conforme definido no planejamento de autenticação.
+No MVP, cada grupo terá uma chave principal ativa por ambiente. Durante a janela controlada de rotação, uma segunda chave poderá permanecer ativa temporariamente, conforme definido no planejamento de autenticação.
 
 ## Schema exclusivo do grupo
 

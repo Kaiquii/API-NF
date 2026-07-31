@@ -107,11 +107,15 @@ Resultado: processamento assincrono por worker, geracao e validacao do XML, assi
 
 ### Etapa 8 - Seguranca e dados sensiveis
 
-Status: `[ ]`
+Status: `[x]`
 
 Definir como certificados digitais e respectivas senhas serao criptografados, acessados e auditados. Tambem inclui gestao de segredos, retencao de XMLs e payloads, mascaramento de logs e permissoes administrativas.
 
-Resultado esperado: politica de seguranca para certificados, dados fiscais, logs, auditoria e acesso administrativo.
+As decisoes desta etapa estao documentadas em `docs/planejado-falta-implementar/SEGURANCA_E_DADOS_SENSIVEIS.md`.
+
+Revisoes juridica, fiscal e independente de seguranca foram registradas como portoes obrigatorios antes da primeira producao, sem bloquear a implementacao.
+
+Resultado: classificacao de dados, protecao de certificados e segredos, rotacao de API keys, autorizacao, isolamento multi-tenant, armazenamento seguro, retencao, auditoria, recuperacao, incidentes e testes minimos definidos de forma proporcional ao MVP.
 
 ### Etapa 9 - Banco de dados e migrations multi-tenant
 
