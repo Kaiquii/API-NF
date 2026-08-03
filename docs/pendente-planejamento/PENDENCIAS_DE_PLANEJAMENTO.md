@@ -131,7 +131,7 @@ Resultado: modelo fisico central e por tenant, convencoes de tipos e invariantes
 
 ### Etapa 10 - Operacao e suporte
 
-Status: `[ ]`
+Status: `[x]`
 
 Definir os recursos para acompanhamento da emissao:
 
@@ -143,7 +143,9 @@ Definir os recursos para acompanhamento da emissao:
 - metricas, alertas e logs operacionais;
 - painel administrativo futuro.
 
-Resultado esperado: definicao de observabilidade, atendimento de falhas, webhooks e recursos administrativos necessarios para operar o produto.
+As decisoes desta etapa estao documentadas em `docs/planejado-falta-implementar/OPERACAO_E_SUPORTE.md`.
+
+Resultado: consulta como fonte de verdade, correlacao ponta a ponta, erros estruturados, webhooks assinados e retentaveis, observabilidade segura, objetivos de servico, alertas acionaveis, severidades, runbooks e operacoes administrativas minimas auditadas.
 
 ### Etapa 11 - Plano de implementacao do MVP
 
@@ -165,3 +167,4 @@ Os documentos abaixo ja possuem uma direcao arquitetural e estao em `docs/planej
 - contratos da API e mapeamento de integracoes;
 - integracao assincrona com a SEFAZ.
 - banco de dados e migrations multi-tenant.
+- operacao, suporte, observabilidade e webhooks.
