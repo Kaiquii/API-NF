@@ -149,11 +149,13 @@ Resultado: consulta como fonte de verdade, correlacao ponta a ponta, erros estru
 
 ### Etapa 11 - Plano de implementacao do MVP
 
-Status: `[ ]`
+Status: `[x]`
 
 Transformar as decisoes anteriores em fases tecnicas de implementacao, com dependencias, entregas e criterios de validacao.
 
-Resultado esperado: backlog tecnico do MVP, organizado em ordem de execucao.
+As decisoes desta etapa estao documentadas em `docs/planejado-falta-implementar/PLANO_DE_IMPLEMENTACAO_DO_MVP.md`.
+
+Resultado: escopo e caminho critico do MVP organizados em Marcos M0 a M11, com manifesto fiscal do piloto, backlog rastreavel, dependencias, criterios de aceite, testes, Definition of Ready, Definition of Done, portoes de homologacao e producao, riscos e checklist do piloto controlado.
 
 ## Planejamentos ja definidos
 
@@ -168,3 +170,4 @@ Os documentos abaixo ja possuem uma direcao arquitetural e estao em `docs/planej
 - integracao assincrona com a SEFAZ.
 - banco de dados e migrations multi-tenant.
 - operacao, suporte, observabilidade e webhooks.
+- plano de implementacao e prontidao do MVP.
