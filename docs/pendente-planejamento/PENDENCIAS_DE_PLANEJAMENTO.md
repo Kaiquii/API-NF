@@ -119,13 +119,15 @@ Resultado: classificacao de dados, protecao de certificados e segredos, rotacao 
 
 ### Etapa 9 - Banco de dados e migrations multi-tenant
 
-Status: `[ ]`
+Status: `[x]`
 
 Definir o modelo fisico das tabelas do schema `platform` e dos schemas dos grupos, suas chaves, indices, restricoes e estrategia de migracao.
 
 As migrations precisam ser aplicadas no schema central e em todos os schemas de grupos com versao, execucao segura, acompanhamento de falhas e possibilidade de recuperacao. Novos grupos devem nascer na versao mais recente.
 
-Resultado esperado: modelo de dados fisico e processo confiavel de provisionamento e atualizacao de schemas.
+As decisoes desta etapa estao documentadas em `docs/planejado-falta-implementar/BANCO_DE_DADOS_E_MIGRATIONS_MULTI_TENANT.md`.
+
+Resultado: modelo fisico central e por tenant, convencoes de tipos e invariantes, indices, papeis de banco, provisionamento idempotente, migrations versionadas, recuperacao individual, deteccao de drift e testes obrigatorios definidos para implementacao.
 
 ### Etapa 10 - Operacao e suporte
 
@@ -162,3 +164,4 @@ Os documentos abaixo ja possuem uma direcao arquitetural e estao em `docs/planej
 - numeracao, idempotencia e maquina de estados;
 - contratos da API e mapeamento de integracoes;
 - integracao assincrona com a SEFAZ.
+- banco de dados e migrations multi-tenant.
